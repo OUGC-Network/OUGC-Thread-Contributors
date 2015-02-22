@@ -34,7 +34,13 @@ defined('IN_MYBB') or die('Direct initialization of this file is not allowed.');
 defined('PLUGINLIBRARY') or define('PLUGINLIBRARY', MYBB_ROOT.'inc/plugins/pluginlibrary.php');
 
 // Add our hook
-if(!defined('IN_ADMINCP'))
+if(defined('IN_ADMINCP'))
+{
+	$plugins->add_hook('admin_config_settings_start', 'ougc_threadcontributors_lang_load');
+	$plugins->add_hook('admin_style_templates_set', 'ougc_threadcontributors_lang_load');
+	$plugins->add_hook('admin_config_settings_change', 'ougc_threadcontributors_settings_change');
+}
+else
 {
 	global $templatelist;
 
@@ -47,29 +53,65 @@ if(!defined('IN_ADMINCP'))
 		$templatelist = '';
 	}
 
-	$templatelist .= 'ougc_threadcontributors, ougc_threadcontributors_user, ougc_threadcontributors_user_avatar, ougc_threadcontributors_user_plain';
+	$templatelist .= 'ougcthreadcontributors, ougcthreadcontributors_user, ougcthreadcontributors_user_avatar, ougcthreadcontributors_user_plain';
 
 	$plugins->add_hook('showthread_end', 'ougc_threadcontributors_showthread');
 }
 
+// PLUGINLIBRARY
+defined('PLUGINLIBRARY') or define('PLUGINLIBRARY', MYBB_ROOT.'inc/plugins/pluginlibrary.php');
+
 // Necessary plugin information for the ACP plugin manager.
 function ougc_threadcontributors_info()
 {
+	global $lang;
+	ougc_threadcontributors_lang_load();
+
 	return array(
 		'name'			=> 'OUGC Thread Contributors',
-		'description'	=> 'Shows a list of users who contributed to a thread discussion.',
+		'description'	=> $lang->setting_group_ougc_threadcontributors,
 		'website'		=> 'http://omarg.me',
 		'author'		=> 'Omar G.',
 		'authorsite'	=> 'http://omarg.me',
 		'version'		=> '1.0.0',
-		'compatibility'	=> '18*'
+		'versioncode'	=> 1000,
+		'compatibility'	=> '18*',
+		'pl'			=> array(
+			'version'	=> 12,
+			'url'		=> 'http://mods.mybb.com/view/pluginlibrary'
+		)
 	);
 }
 
 // _activate() routine
 function ougc_threadcontributors_activate()
 {
-	global $cache;
+	global $PL, $cache, $lang;
+	ougc_threadcontributors_pl_check();
+
+	// Add settings group
+	$PL->settings('ougc_threadcontributors', $lang->setting_group_ougc_threadcontributors, $lang->setting_group_ougc_threadcontributors_desc, array(
+		'showavatars'	=> array(
+		   'title'			=> $lang->setting_ougc_threadcontributors_showavatars,
+		   'description'	=> $lang->setting_ougc_threadcontributors_showavatars_desc,
+		   'optionscode'	=> 'yesno',
+			'value'			=>	0,
+		),
+	));
+
+	// Add template group
+	$PL->templates('ougcthreadcontributors', '<lang:setting_group_ougc_threadcontributors>', array(
+		''	=> '<br />
+<span class="smalltext">{$lang->ougc_threadcontributors_contributors}: {$users}</span>
+<br />',
+		'user'	=> '{$comma}<a href="{$user[\'profilelink\']}" title="{$user[\'username\']}">{$dyn}</a>',
+		'user_avatar'	=> '<img src="{$avatar[\'image\']}" alt="{$user[\'username\']}" {$avatar[\'width_height\']} />',
+		'user_plain'	=> '{$user[\'username_formatted\']}',
+	));
+
+	// Modify templates
+	require_once MYBB_ROOT.'/inc/adminfunctions_templates.php';
+	find_replace_templatesets('showthread', '#'.preg_quote('{$usersbrowsing}').'#', '{$usersbrowsing}{$ougc_threadcontributors}');
 
 	// Insert/update version into cache
 	$plugins = $cache->read('ougc_plugins');
@@ -91,6 +133,17 @@ function ougc_threadcontributors_activate()
 
 	$plugins['threadcontributors'] = $info['versioncode'];
 	$cache->update('ougc_plugins', $plugins);
+}
+
+// _deactivate() routine
+function ougc_threadcontributors_deactivate()
+{
+	global $cache;
+	ougc_threadcontributors_pl_check();
+
+	// Revert template edits
+	require_once MYBB_ROOT.'/inc/adminfunctions_templates.php';
+	find_replace_templatesets('showthread', '#'.preg_quote('{$ougc_threadcontributors}').'#', '', 0);
 }
 
 // _is_installed() routine
@@ -126,26 +179,71 @@ function ougc_threadcontributors_uninstall()
 	}
 }
 
+// PluginLibrary dependency check & load
+function ougc_threadcontributors_pl_check()
+{
+	global $lang;
+	ougc_threadcontributors_lang_load();
+	$info = ougc_threadcontributors_info();
+
+	if(!file_exists(PLUGINLIBRARY))
+	{
+		flash_message($lang->sprintf($lang->ougc_threadcontributors_pl_required, $info['pl']['url'], $info['pl']['version']), 'error');
+		admin_redirect('index.php?module=config-plugins');
+		exit;
+	}
+
+	global $PL;
+
+	$PL or require_once PLUGINLIBRARY;
+
+	if($PL->version < $info['pl']['version'])
+	{
+		flash_message($lang->sprintf($lang->ougc_threadcontributors_pl_old, $info['pl']['url'], $info['pl']['version'], $PL->version), 'error');
+		admin_redirect('index.php?module=config-plugins');
+		exit;
+	}
+}
+
+// Pretty settings
+function ougc_threadcontributors_settings_change()
+{
+	global $db, $mybb;
+
+	$query = $db->simple_select('settinggroups', 'name', 'gid=\''.(int)$mybb->input['gid'].'\'');
+	$groupname = $db->fetch_field($query, 'name');
+	if($groupname == 'ougc_threadcontributors')
+	{
+		ougc_threadcontributors_lang_load();
+	}
+}
+
+// Load language file
+function ougc_threadcontributors_lang_load()
+{
+	global $lang;
+
+	isset($lang->setting_group_ougc_threadcontributors) or $lang->load('ougc_threadcontributors');
+}
+
+// Dark magic
 function ougc_threadcontributors_showthread()
 {
-	global $db, $tid, $visible, $mybb, $templates, $ougc_threadcontributors;
+	global $db, $tid, $visible, $mybb, $templates, $ougc_threadcontributors, $lang;
+	ougc_threadcontributors_lang_load();
+
+	$comma = $ougc_threadcontributors = '';
 
 	// Lets get the pids of the posts on this page.
-	$pids = $comma = $ougc_threadcontributors = '';
 	$query = $db->query("
-		SELECT u.uid, u.username, u.avatar, u.avatardimensions, u.usergroup, u.displaygroup, p.dateline
+		SELECT u.uid, u.username, u.avatar, u.avatardimensions, u.usergroup, u.displaygroup, p.username AS postusername, p.dateline
 		FROM ".TABLE_PREFIX."posts p
 		LEFT JOIN ".TABLE_PREFIX."users u ON (u.uid=p.uid)
 		WHERE p.tid='{$tid}'{$visible}
 		ORDER BY p.dateline DESC
 	");
 
-	$templates->cache['ougc_threadcontributors'] = '<br />
-<span class="smalltext">Users that contributed: {$users}</span>
-<br />';
-	$templates->cache['ougc_threadcontributors_user'] = '{$comma}<a href="{$user[\'profilelink\']}" title="{$date}">{$dyn}</a>';
-	$templates->cache['ougc_threadcontributors_user_avatar'] = '<img src="{$avatar[\'image\']}" alt="" {$avatar[\'width_height\']} />';
-	$templates->cache['ougc_threadcontributors_user_plain'] = '{$user[\'username\']}';
+	$showavatars = $mybb->settings['ougc_threadcontributors_showavatars'] && $mybb->user['showavatars'];
 
 	$done_users = array();
 	while($user = $db->fetch_array($query, 'pid'))
@@ -157,32 +255,32 @@ function ougc_threadcontributors_showthread()
 
 		$done_users[$user['uid']] = true;
 
+		$user['username'] = $user['username'] ? $user['username'] : $user['postusername'];
+		$user['username'] = htmlspecialchars_uni($user['username']);
+
 		$date = my_date('relative', $user['dateline']);
 
 		$user['profilelink'] = get_profile_link($user['uid']);
-		$user['username'] = format_name($user['username'], $user['usergroup'], $user['displaygroup']);
+		$user['username_formatted'] = format_name($user['username'], $user['usergroup'], $user['displaygroup']);
 
-		if($mybb->user['showavatars'])
+		if($showavatars)
 		{
-			$avatar = ougc_format_avatar($user['avatar'], $user['avatardimensions'], '30x30');
-			eval('$dyn = "'.$templates->get('ougc_threadcontributors_user_avatar').'";');
+			$avatar = ougc_threadcontributors_format_avatar($user['avatar'], $user['avatardimensions'], '30x30');
+			eval('$dyn = "'.$templates->get('ougcthreadcontributors_user_avatar').'";');
 		}
 		else
 		{
-			eval('$dyn = "'.$templates->get('ougc_threadcontributors_user_plain').'";');
+			eval('$dyn = "'.$templates->get('ougcthreadcontributors_user_plain').'";');
 		}
 
-		eval('$users .= "'.$templates->get('ougc_threadcontributors_user').'";');
+		eval('$users .= "'.$templates->get('ougcthreadcontributors_user').'";');
 
-		if(!$mybb->user['showavatars'])
-		{
-			$comma = ', ';
-		}
+		$comma = $showavatars ? '' : $lang->ougc_threadcontributors_comma.' ';
 	}
 
 	$users or $users = 'None';
 
-	eval('$ougc_threadcontributors .= "'.$templates->get('ougc_threadcontributors').'";');
+	eval('$ougc_threadcontributors = "'.$templates->get('ougcthreadcontributors').'";');
 }
 
 /**
@@ -193,7 +291,7 @@ function ougc_threadcontributors_showthread()
  * @param string The maximum dimensions of the formatted avatar
  * @return array Information for the formatted avatar
  */
-function ougc_format_avatar($avatar, $dimensions = '', $max_dimensions = '')
+function ougc_threadcontributors_format_avatar($avatar, $dimensions = '', $max_dimensions = '')
 {
 	global $mybb;
 	static $avatars;

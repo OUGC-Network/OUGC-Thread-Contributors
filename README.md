@@ -12,6 +12,7 @@ Shows a list of users who contributed to a thread discussion.
 ### Installation
 1. Upload the content of the "upload" folder to your MyBB root folder.
 2. Go to ACP -> Configuration -> Plugins and activate/install the plugin.
+2. Go to ACP -> Configuration -> Settings -> OUGC Thread Contributors to update the pugin settings.
 4. __Enjoy!__
 
 ### Update
@@ -21,7 +22,7 @@ Shows a list of users who contributed to a thread discussion.
 4. __Enjoy!__
 
 ### Support
-Please visit [MyBB Plugins](http://forums.mybb-plugins.com/Forum-Free-Plugins--29 "Visit MyBB Plugins") for premium support. Free support may be received in the [MyBB Community](http://community.mybb.com "Visit MyBB Community")
+Please visit [MyBB Plugins](http://forums.mybb-plugins.com/Forum-Free-Plugins--47 "Visit MyBB Plugins") for premium support. Free support may be received in the [MyBB Community](http://community.mybb.com "Visit MyBB Community")
 
 ### Thank You!
 Remember those are free releases developed on my personal free time let it be because I like it or because of customer's requests.
