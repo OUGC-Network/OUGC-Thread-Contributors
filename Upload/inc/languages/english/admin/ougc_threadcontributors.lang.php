@@ -34,6 +34,12 @@ $l['setting_group_ougc_threadcontributors_desc'] = 'Shows a list of users who co
 // Settings
 $l['setting_ougc_threadcontributors_showavatars'] = 'Show Users Avatars';
 $l['setting_ougc_threadcontributors_showavatars_desc'] = 'If set to no a list of user names will be displayed.';
+$l['setting_ougc_threadcontributors_orderby'] = 'Order By';
+$l['setting_ougc_threadcontributors_orderby_desc'] = 'Please select the order by field to use.';
+$l['setting_ougc_threadcontributors_orderby_username'] = 'Username';
+$l['setting_ougc_threadcontributors_orderby_posttime'] = 'Post Time';
+$l['setting_ougc_threadcontributors_orderby'] = 'Order On Ascending Order';
+$l['setting_ougc_threadcontributors_orderby_desc'] = 'Select if you want to reverse the ordering of users.';
 
 // PluginLibrary
 $l['ougc_threadcontributors_pl_required'] = 'This plugin requires <a href="{1}">PluginLibrary</a> version {2} or later to be uploaded to your forum.';

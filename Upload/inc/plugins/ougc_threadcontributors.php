@@ -93,11 +93,25 @@ function ougc_threadcontributors_activate()
 	// Add settings group
 	$PL->settings('ougc_threadcontributors', $lang->setting_group_ougc_threadcontributors, $lang->setting_group_ougc_threadcontributors_desc, array(
 		'showavatars'	=> array(
-		   'title'			=> $lang->setting_ougc_threadcontributors_showavatars,
-		   'description'	=> $lang->setting_ougc_threadcontributors_showavatars_desc,
-		   'optionscode'	=> 'yesno',
+			'title'			=> $lang->setting_ougc_threadcontributors_showavatars,
+			'description'	=> $lang->setting_ougc_threadcontributors_showavatars_desc,
+			'optionscode'	=> 'yesno',
 			'value'			=>	0,
 		),
+		'orderby'	=> array(
+			'title'			=> $lang->setting_ougc_threadcontributors_orderby,
+			'description'	=> $lang->setting_ougc_threadcontributors_orderby_desc,
+			'optionscode'	=> "select
+username={$lang->setting_ougc_threadcontributors_orderby_username}
+posttime={$lang->setting_ougc_threadcontributors_orderby_posttime}",
+			'value'			=>	'username',
+		),
+		'orderby'	=> array(
+			'title'			=> $lang->setting_ougc_threadcontributors_orderdir,
+			'description'	=> $lang->setting_ougc_threadcontributors_orderdir_desc,
+			'optionscode'	=> 'yesno',
+			'value'			=>	0,
+		)
 	));
 
 	// Add template group
@@ -160,7 +174,11 @@ function ougc_threadcontributors_is_installed()
 // _uninstall() routine
 function ougc_threadcontributors_uninstall()
 {
-	global $cache;
+	global $PL, $cache;
+	ougc_threadcontributors_pl_check();
+
+	$PL->settings_delete('ougc_threadcontributors');
+	$PL->templates_delete('ougcthreadcontributors');
 
 	// Delete version from cache
 	$plugins = (array)$cache->read('ougc_plugins');
@@ -235,13 +253,23 @@ function ougc_threadcontributors_showthread()
 
 	$comma = $ougc_threadcontributors = '';
 
+	$options = array('orderby' => 'p.dateline', 'orderdir' => 'DESC');
+	if($mybb->settings['orderby'] == 'username')
+	{
+		$options['orderby'] = 'u.username';
+	}
+	if($mybb->settings['orderdir'])
+	{
+		$options['orderdir'] = 'ASC';
+	}
+
 	// Lets get the pids of the posts on this page.
 	$query = $db->query("
 		SELECT u.uid, u.username, u.avatar, u.avatardimensions, u.usergroup, u.displaygroup, p.username AS postusername, p.dateline
 		FROM ".TABLE_PREFIX."posts p
 		LEFT JOIN ".TABLE_PREFIX."users u ON (u.uid=p.uid)
 		WHERE p.tid='{$tid}'{$visible}
-		ORDER BY p.dateline DESC
+		ORDER BY {$options['orderby']} {$options['orderdir']}
 	");
 
 	$showavatars = $mybb->settings['ougc_threadcontributors_showavatars'] && $mybb->user['showavatars'];
