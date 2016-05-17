@@ -76,6 +76,7 @@ function ougc_threadcontributors_info()
 		'version'		=> '1.0.0',
 		'versioncode'	=> 1000,
 		'compatibility'	=> '18*',
+		'codename'		=> 'ougc_threadcontributors',
 		'pl'			=> array(
 			'version'	=> 12,
 			'url'		=> 'http://mods.mybb.com/view/pluginlibrary'
