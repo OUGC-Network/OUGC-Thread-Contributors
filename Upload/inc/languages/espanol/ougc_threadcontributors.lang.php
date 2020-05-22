@@ -2,7 +2,7 @@
 
 /***************************************************************************
  *
- *   OUGC Thread Contributors plugin (/inc/languages/english/ougc_threadcontributors.lang.php)
+ *   OUGC Thread Contributors plugin (/inc/languages/espanol/ougc_threadcontributors.lang.php)
  *	 Author: Omar Gonzalez
  *   Copyright: © 2014-2020 Omar Gonzalez
  *   
@@ -31,5 +31,5 @@
 $l['setting_group_ougc_threadcontributors'] = 'OUGC Thread Contributors';
 
 // Fron-end
-$l['ougc_threadcontributors_contributors'] = 'Contributors';
+$l['ougc_threadcontributors_contributors'] = 'Colaboradores';
 $l['ougc_threadcontributors_comma'] = ', ';
