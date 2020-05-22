@@ -32,4 +32,4 @@ $l['setting_group_ougc_threadcontributors'] = 'OUGC Thread Contributors';
 
 // Fron-end
 $l['ougc_threadcontributors_contributors'] = 'Contributors';
-$l['ougc_threadcontributors_comma'] = ',';
+$l['ougc_threadcontributors_comma'] = ', ';
