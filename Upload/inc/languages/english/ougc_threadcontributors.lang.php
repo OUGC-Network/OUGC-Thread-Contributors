@@ -4,14 +4,14 @@
  *
  *   OUGC Thread Contributors plugin (/inc/languages/english/ougc_threadcontributors.lang.php)
  *	 Author: Omar Gonzalez
- *   Copyright: © 2014 Omar Gonzalez
+ *   Copyright: © 2014-2020 Omar Gonzalez
  *   
- *   Website: http://omarg.me
+ *   Website: https://ougc.network
  *
  *   Shows a list of users who contributed to a thread discussion.
  *
  ***************************************************************************
- 
+
 ****************************************************************************
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by

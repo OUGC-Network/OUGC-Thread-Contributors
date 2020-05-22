@@ -4,14 +4,14 @@
  *
  *   OUGC Thread Contributors plugin (/inc/languages/english/admin/ougc_threadcontributors.lang.php)
  *	 Author: Omar Gonzalez
- *   Copyright: © 2014 Omar Gonzalez
+ *   Copyright: © 2014-2020 Omar Gonzalez
  *   
- *   Website: http://omarg.me
+ *   Website: https://ougc.network
  *
  *   Shows a list of users who contributed to a thread discussion.
  *
  ***************************************************************************
- 
+
 ****************************************************************************
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -38,9 +38,12 @@ $l['setting_ougc_threadcontributors_orderby'] = 'Order By';
 $l['setting_ougc_threadcontributors_orderby_desc'] = 'Please select the order by field to use.';
 $l['setting_ougc_threadcontributors_orderby_username'] = 'Username';
 $l['setting_ougc_threadcontributors_orderby_posttime'] = 'Post Time';
-$l['setting_ougc_threadcontributors_orderby'] = 'Order On Ascending Order';
-$l['setting_ougc_threadcontributors_orderby_desc'] = 'Select if you want to reverse the ordering of users.';
+$l['setting_ougc_threadcontributors_orderdir'] = 'Order On Ascending Order';
+$l['setting_ougc_threadcontributors_orderdir_desc'] = 'Select if you want to reverse the ordering of users.';
+$l['setting_ougc_threadcontributors_ignoreauthor'] = 'Ignore Authors';
+$l['setting_ougc_threadcontributors_ignoreauthor_desc'] = 'Should the contributor list ignore the thread author?';
+$l['setting_ougc_threadcontributors_maxsize'] = 'Maximum Width and Height Size';
+$l['setting_ougc_threadcontributors_maxsize_desc'] = 'Please input the maximum image size for both the width and height.';
 
 // PluginLibrary
 $l['ougc_threadcontributors_pl_required'] = 'This plugin requires <a href="{1}">PluginLibrary</a> version {2} or later to be uploaded to your forum.';
-$l['ougc_threadcontributors_pl_old'] = 'This plugin requires <a href="{1}">PluginLibrary</a> version {2} or later, whereas your current version is {3}.';
