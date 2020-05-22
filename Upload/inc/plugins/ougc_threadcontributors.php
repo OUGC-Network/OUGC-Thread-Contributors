@@ -306,7 +306,9 @@ function ougc_threadcontributors_showthread()
 
 	if(empty($thread['ougc_threadcontributors']))
 	{
-		$uids = $ougc_threadcontributors->update_thread($tid);
+		$ougc_threadcontributors->set_update_thread($tid);
+
+		$uids = $ougc_threadcontributors->update_thread();
 	}
 
 	if(empty($uids))
@@ -316,7 +318,7 @@ function ougc_threadcontributors_showthread()
 
 	$uids = implode("','", array_values($uids));
 
-	$author = (int)$thread['tid'];
+	$author = (int)$thread['uid'];
 
 	if($mybb->settings['ougc_threadcontributors_orderby'] == 'posttime')
 	{
@@ -400,6 +402,26 @@ function ougc_threadcontributors_showthread()
 // Plugin class
 class OUGC_ThreadContributors
 {
+	private $update_thread = 0;
+
+	function __construct()
+	{
+		global $plugins, $settings, $templatelist;
+
+		// Tell MyBB when to run the hook
+		if(!defined('IN_ADMINCP'))
+		{
+			$plugins->add_hook('class_moderation_delete_post', array($this, 'hook_class_moderation_delete_post_start'));
+			$plugins->add_hook('class_moderation_merge_posts', array($this, 'hook_class_moderation_merge_posts'));
+			$plugins->add_hook('class_moderation_merge_threads', array($this, 'hook_class_moderation_merge_posts'));
+			$plugins->add_hook('class_moderation_split_posts', array($this, 'hook_class_moderation_merge_posts'));
+			$plugins->add_hook('class_moderation_approve_posts', array($this, 'hook_class_moderation_approve_posts'));
+			$plugins->add_hook('class_moderation_unapprove_posts', array($this, 'hook_class_moderation_approve_posts'));
+			$plugins->add_hook('class_moderation_soft_delete_posts', array($this, 'hook_class_moderation_approve_posts'));
+			$plugins->add_hook('class_moderation_restore_posts', array($this, 'hook_class_moderation_approve_posts'));
+		}
+	}
+
 	// Plugin API:_is_installed() routine
 	function _is_installed()
 	{
@@ -451,11 +473,14 @@ class OUGC_ThreadContributors
 		}
 	}
 
-	function update_thread($tid)
+	function update_thread()
 	{
 		global $db;
 
-		$tid = (int)$tid;
+		if(!($tid = $this->get_update_thread()))
+		{
+			return false;
+		}
 
 		$query = $db->simple_select('posts', 'uid', "tid='{$tid}' AND visible='1'");
 
@@ -474,6 +499,67 @@ class OUGC_ThreadContributors
 		}
 
 		return $uids;
+	}
+
+	function set_update_thread($tid)
+	{
+		$this->update_thread = (int)$tid;
+	}
+
+	function get_update_thread()
+	{
+		return $this->update_thread;
+	}
+
+	function hook_class_moderation_delete_post_start(&$pid)
+	{
+		global $plugins;
+
+		$post = get_post($pid);
+
+		$thread = get_thread($post['tid']);
+
+		$this->set_update_thread($thread['tid']);
+
+		$plugins->add_hook('class_moderation_delete_post', array($this, 'hook_class_moderation_delete_post'));
+	}
+
+	function hook_class_moderation_delete_post(&$pid)
+	{
+		$this->update_thread();
+	}
+
+	function hook_class_moderation_merge_posts(&$args)
+	{
+		$this->set_update_thread($args['tid']);
+
+		$this->update_thread();
+	}
+
+	function hook_class_moderation_approve_posts(&$pids)
+	{
+		if(!empty($pids))
+		{
+			global $db;
+
+			$done = array();
+
+			$query = $db->simple_select('posts', 'tid', "pid IN (".implode(',', $pids).")");
+
+			while($tid = (int)$db->fetch_field($query, 'tid'))
+			{
+				if(isset($done[$tid]))
+				{
+					continue;
+				}
+		
+				$done[$tid] = $tid;
+
+				$this->set_update_thread($tid);
+		
+				$this->update_thread();
+			}
+		}
 	}
 }
 
