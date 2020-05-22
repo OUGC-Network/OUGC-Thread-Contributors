@@ -69,7 +69,7 @@ function ougc_threadcontributors_info()
 
 	return array(
 		'name'			=> 'OUGC Thread Contributors',
-		'description'	=> $lang->setting_group_ougc_threadcontributors,
+		'description'	=> $lang->setting_group_ougc_threadcontributors_desc,
 		'website'		=> 'https://ougc.network',
 		'author'		=> 'Omar G.',
 		'authorsite'	=> 'https://ougc.network',
@@ -419,6 +419,9 @@ class OUGC_ThreadContributors
 			$plugins->add_hook('class_moderation_unapprove_posts', array($this, 'hook_class_moderation_approve_posts'));
 			$plugins->add_hook('class_moderation_soft_delete_posts', array($this, 'hook_class_moderation_approve_posts'));
 			$plugins->add_hook('class_moderation_restore_posts', array($this, 'hook_class_moderation_approve_posts'));
+
+			$plugins->add_hook('datahandler_post_insert_post_end', array($this, 'hook_datahandler_post_insert_post_end'));
+			$plugins->add_hook('datahandler_post_update_end', array($this, 'hook_datahandler_post_insert_post_end'));
 		}
 	}
 
@@ -517,9 +520,7 @@ class OUGC_ThreadContributors
 
 		$post = get_post($pid);
 
-		$thread = get_thread($post['tid']);
-
-		$this->set_update_thread($thread['tid']);
+		$this->set_update_thread($post['tid']);
 
 		$plugins->add_hook('class_moderation_delete_post', array($this, 'hook_class_moderation_delete_post'));
 	}
@@ -560,6 +561,13 @@ class OUGC_ThreadContributors
 				$this->update_thread();
 			}
 		}
+	}
+
+	function hook_datahandler_post_insert_post_end(&$dh)
+	{
+		$this->set_update_thread($dh->data['tid']);
+
+		$this->update_thread();
 	}
 }
 
