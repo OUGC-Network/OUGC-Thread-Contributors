@@ -99,6 +99,12 @@ function ougc_threadcontributors_activate()
 			'optionscode'	=> 'yesno',
 			'value'			=>	0,
 		),
+		'showavatars_guests'	=> array(
+			'title'			=> $lang->setting_ougc_threadcontributors_showavatars_guests,
+			'description'	=> $lang->setting_ougc_threadcontributors_showavatars_guests_desc,
+			'optionscode'	=> 'yesno',
+			'value'			=>	1,
+		),
 		'orderby'	=> array(
 			'title'			=> $lang->setting_ougc_threadcontributors_orderby,
 			'description'	=> $lang->setting_ougc_threadcontributors_orderby_desc,
@@ -353,7 +359,7 @@ function ougc_threadcontributors_showthread()
 		);
 	}
 
-	$showavatars = $mybb->settings['ougc_threadcontributors_showavatars'] && $mybb->user['showavatars'];
+	$showavatars = $mybb->settings['ougc_threadcontributors_showavatars'] && ((!$mybb->user['uid'] && $mybb->settings['ougc_threadcontributors_showavatars_guests']) || $mybb->user['showavatars']);
 
 	$max_dimension = (int)$mybb->settings['ougc_threadcontributors_maxsize'];
 
