@@ -53,7 +53,7 @@ else
 		$templatelist = '';
 	}
 
-	$templatelist .= 'ougcthreadcontributors, ougcthreadcontributors_user, ougcthreadcontributors_user_avatar, ougcthreadcontributors_user_plain';
+	$templatelist .= 'ougcthreadcontributors, ougcthreadcontributors_user, ougcthreadcontributors_user_avatar, ougcthreadcontributors_user_plain, ougcthreadcontributors_user_postcount';
 
 	$plugins->add_hook('showthread_end', 'ougc_threadcontributors_showthread');
 }
@@ -105,12 +105,19 @@ function ougc_threadcontributors_activate()
 			'optionscode'	=> 'yesno',
 			'value'			=>	1,
 		),
+		'count_posts'	=> array(
+			'title'			=> $lang->setting_ougc_threadcontributors_count_posts,
+			'description'	=> $lang->setting_ougc_threadcontributors_count_posts_desc,
+			'optionscode'	=> 'yesno',
+			'value'			=>	0,
+		),
 		'orderby'	=> array(
 			'title'			=> $lang->setting_ougc_threadcontributors_orderby,
 			'description'	=> $lang->setting_ougc_threadcontributors_orderby_desc,
 			'optionscode'	=> "radio
 username={$lang->setting_ougc_threadcontributors_orderby_username}
-posttime={$lang->setting_ougc_threadcontributors_orderby_posttime}",
+posttime={$lang->setting_ougc_threadcontributors_orderby_posttime}
+postcount={$lang->setting_ougc_threadcontributors_orderby_postcount}",
 			'value'			=>	'username',
 		),
 		'orderdir'	=> array(
@@ -278,7 +285,8 @@ function ougc_threadcontributors_settings_change()
 	global $db, $mybb;
 
 	$query = $db->simple_select('settinggroups', 'name', 'gid=\''.(int)$mybb->input['gid'].'\'');
-	$groupname = $db->fetch_field($query, 'name');
+
+	$groupname = (string)$db->fetch_field($query, 'name');
 
 	if($groupname == 'ougc_threadcontributors')
 	{
@@ -301,7 +309,7 @@ function ougc_threadcontributors_showthread()
 
 	ougc_threadcontributors_lang_load();
 
-	$comma = $ougc_threadcontributors_list = $where = $users = '';
+	$comma = $ougc_threadcontributors_list = $users = '';
 
 	$orderdir = 'DESC';
 
@@ -326,34 +334,72 @@ function ougc_threadcontributors_showthread()
 
 	$author = (int)$thread['uid'];
 
-	if($mybb->settings['ougc_threadcontributors_orderby'] == 'posttime')
-	{
-		if($mybb->settings['ougc_threadcontributors_ignoreauthor'])
-		{
-			$where = " AND u.uid!='{$author}'";
-		}
+	$where = ["u.uid IN ('{$uids}')"];
 
-		$query = $db->query("
-			SELECT u.uid, u.username, u.avatar, u.avatardimensions, u.usergroup, u.displaygroup
-			FROM ".TABLE_PREFIX."posts p
-			LEFT JOIN ".TABLE_PREFIX."users u ON (u.uid=p.uid)
-			WHERE p.tid='{$tid}' AND u.uid IN ('{$uids}'){$where}
-			ORDER BY p.dateline {$orderdir}
-		");
+	if($mybb->settings['ougc_threadcontributors_ignoreauthor'])
+	{
+		$where[] = "u.uid!='{$author}'";
+	}
+
+	$post_count_cache = [];
+
+	if($mybb->settings['ougc_threadcontributors_count_posts'])
+	{
+		$query = $db->simple_select(
+			"posts p LEFT JOIN {$db->table_prefix}users u ON (u.uid=p.uid)",
+			'p.uid',
+			implode(' AND ', array_merge($where, ["p.tid='{$tid}' AND p.visible='1'"]))
+		);
+
+		while($uid = (int)$db->fetch_field($query, 'uid'))
+		{
+			++$post_count_cache[$uid];
+		}
+	}
+
+	if($mybb->settings['ougc_threadcontributors_orderby'] == 'postcount')
+	{
+		$where[] = "p.tid='{$tid}' AND p.visible='1'";
+
+		$where = implode(' AND ', $where);
+
+		$query = $db->simple_select(
+			"users u INNER JOIN {$db->table_prefix}posts p ON (p.uid=u.uid)",
+			'u.uid, u.username, u.avatar, u.avatardimensions, u.usergroup, u.displaygroup, COUNT(p.pid) AS total_posts',
+			$where,
+			array(
+				'order_by' => 'total_posts',
+				'order_dir' => $orderdir,
+				'group_by' => 'u.uid',
+			)
+		);
+	}
+	elseif($mybb->settings['ougc_threadcontributors_orderby'] == 'posttime')
+	{
+		$where[] = "p.tid='{$tid}' AND p.visible='1'";
+
+		$where = implode(' AND ', $where);
+
+		$query = $db->simple_select(
+			"users u LEFT JOIN {$db->table_prefix}posts p ON (p.uid=u.uid)",
+			'u.uid, u.username, u.avatar, u.avatardimensions, u.usergroup, u.displaygroup',
+			$where,
+			array(
+				'order_by' => 'p.dateline',
+				'order_dir' => $orderdir
+			)
+		);
 	}
 	else
 	{
-		if($mybb->settings['ougc_threadcontributors_ignoreauthor'])
-		{
-			$where = " AND uid!='{$author}'";
-		}
+		$where = implode(' AND ', $where);
 
 		$query = $db->simple_select(
-			'users',
-			'uid, username, avatar, avatardimensions, usergroup, displaygroup',
-			"uid IN ('{$uids}'){$where}",
+			'users u',
+			'u.uid, u.username, u.avatar, u.avatardimensions, u.usergroup, u.displaygroup',
+			$where,
 			array(
-				'order_by' => 'username',
+				'order_by' => 'u.username',
 				'order_dir' => $orderdir
 			)
 		);
@@ -367,12 +413,16 @@ function ougc_threadcontributors_showthread()
 
 	$done_users = array();
 
-	while($user = $db->fetch_array($query, 'pid'))
+	while($user = $db->fetch_array($query))
 	{
+		$user['uid'] = (int)$user['uid'];
+
 		if(isset($done_users[$user['uid']]))
 		{
 			continue;
 		}
+
+		$post_count = '';
 
 		$done_users[$user['uid']] = true;
 
@@ -392,6 +442,18 @@ function ougc_threadcontributors_showthread()
 		else
 		{
 			$dyn = eval($templates->render('ougcthreadcontributors_user_plain', true, false));
+		}
+
+		if($mybb->settings['ougc_threadcontributors_count_posts'])
+		{
+			$posts_count = 0;
+
+			if(isset($post_count_cache[$user['uid']]))
+			{
+				$posts_count = my_number_format($post_count_cache[$user['uid']]);
+			}
+
+			$post_count = eval($templates->render('ougcthreadcontributors_user_postcount'));
 		}
 
 		$users .= eval($templates->render('ougcthreadcontributors_user'));
@@ -495,10 +557,8 @@ class OUGC_ThreadContributors
 
 		$uids = array();
 
-		while($uid = $db->fetch_field($query, 'uid'))
+		while($uid = (int)$db->fetch_field($query, 'uid'))
 		{
-			$uid = (int)$uid;
-
 			$uids[$uid] = $uid;
 		}
 
