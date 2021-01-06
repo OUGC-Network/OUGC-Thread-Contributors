@@ -152,9 +152,10 @@ postcount={$lang->setting_ougc_threadcontributors_orderby_postcount}",
 		max-height: {$max_dimension}px;
 	}
 </style>',
-		'user'	=> '{$comma}<a href="{$user[\'profilelink\']}" title="{$user[\'username\']}" class="ougcthreadcontributors_user">{$dyn}</a>',
+		'user'	=> '{$comma}<a href="{$user[\'profilelink\']}" title="{$user[\'username\']}" class="ougcthreadcontributors_user">{$dyn}</a>{$post_count}',
 		'user_avatar'	=> '<img src="{$avatar[\'image\']}" alt="{$user[\'username\']}" {$avatar[\'width_height\']} />',
 		'user_plain'	=> '{$user[\'username_formatted\']}',
+		'user_postcount'	=> ' ({$posts_count})',
 	));
 
 	// Modify templates
