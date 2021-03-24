@@ -319,6 +319,8 @@ function ougc_threadcontributors_showthread()
 		$orderdir = 'ASC';
 	}
 
+	$uids = [];
+
 	if(empty($thread['ougc_threadcontributors']))
 	{
 		$ougc_threadcontributors->set_update_thread($tid);
@@ -331,16 +333,30 @@ function ougc_threadcontributors_showthread()
 		$uids = array_map('intval', explode(',', $thread['ougc_threadcontributors']));
 	}
 
-	$uids = implode("','", array_values($uids));
+	$uids = array_filter($uids);
 
 	$author = (int)$thread['uid'];
 
-	$where = ["u.uid IN ('{$uids}')"];
+	$where = [];
 
 	if($mybb->settings['ougc_threadcontributors_ignoreauthor'])
 	{
+		if(($key = array_search($author, $uids)) !== false)
+		{
+			unset($uids[$key]);
+		}
+
 		$where[] = "u.uid!='{$author}'";
 	}
+
+	if(!$uids)
+	{
+		return;
+	}
+
+	$uids = implode("','", array_values($uids));
+
+	$where[] = "u.uid IN ('{$uids}')";
 
 	$post_count_cache = [];
 
