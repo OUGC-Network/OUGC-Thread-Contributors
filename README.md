@@ -1,6 +1,6 @@
 <p align="center">
     <a href="" rel="noopener">
-        <img width="700" height="400" src="https://github.com/OUGC-Network/OUGC-Thread-Contributors/assets/1786584/d5f06e8a-5850-4836-8a83-b7b5b4f2ecf5" alt="Project logo">
+        <img width="700" height="400" src="https://github.com/OUGC-Network/OUGC-Thread-Contributors/assets/1786584/e3165c81-d3ef-4099-9094-db11ecce12a9" alt="Project logo">
     </a>
 </p>
 
@@ -40,7 +40,7 @@
 
 ## 🚀 About <a name = "about"></a>
 
-OUGC Thread Contributors is a MyBB plugin designed to enhance user engagement and provide a comprehensive overview of thread participants. With this simple plugin, users can easily access a list of contributors who have posted or commented within a thread. The list ensures an accurate representation of participant involvement, fostering greater interaction and community engagement
+OUGC Thread Contributors is a MyBB plugin designed to enhance user engagement and provide a comprehensive overview of thread participants. With this simple plugin, users can easily access a list of contributors who have posted or commented within a thread. The list ensures an accurate representation of participant involvement, fostering greater interaction and community engagement.
 
 [Go up to Table of Contents](#table_of_contents)
 
