@@ -386,6 +386,8 @@ class OUGC_ThreadContributors
             $plugins->add_hook('class_moderation_unapprove_posts', [$this, 'hook_class_moderation_approve_posts']);
             $plugins->add_hook('class_moderation_soft_delete_posts', [$this, 'hook_class_moderation_approve_posts']);
             $plugins->add_hook('class_moderation_restore_posts', [$this, 'hook_class_moderation_approve_posts']);
+            $plugins->add_hook('datahandler_post_insert_post_end', [$this, 'hook_datahandler_post_insert_post_end']);
+            $plugins->add_hook('datahandler_post_update_end', [$this, 'hook_datahandler_post_insert_post_end']); // perhaps the author changed because of external plugins
         }
     }
 
@@ -513,6 +515,15 @@ class OUGC_ThreadContributors
 
                 $this->update_thread();
             }
+        }
+    }
+
+    function hook_datahandler_post_insert_post_end(&$dataHandler): void
+    {
+        if (!empty($dataHandler->data['tid'])) {
+            $this->set_update_thread($dataHandler->data['tid']);
+
+            $this->update_thread();
         }
     }
 }
