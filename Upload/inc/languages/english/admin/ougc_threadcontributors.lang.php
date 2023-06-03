@@ -33,6 +33,8 @@ $l['setting_group_ougc_threadcontributors_desc'] = 'Displays a list of users who
 // Settings
 $l['setting_ougc_threadcontributors_showavatars'] = 'Show Avatars';
 $l['setting_ougc_threadcontributors_showavatars_desc'] = 'If disabled, a list of usernames will be displayed.';
+$l['setting_ougc_threadcontributors_showavatars_guests'] = 'Show Avatars to Guests';
+$l['setting_ougc_threadcontributors_showavatars_guests_desc'] = 'If disabled, a list of usernames will be displayed to guests.';
 $l['setting_ougc_threadcontributors_orderby'] = 'Order By';
 $l['setting_ougc_threadcontributors_orderby_desc'] = 'Order criteria to use: ordering by username could be faster.';
 $l['setting_ougc_threadcontributors_orderby_username'] = 'Username';

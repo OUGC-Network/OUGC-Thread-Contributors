@@ -116,6 +116,8 @@ Below you can find a description of the plugin settings.
 
 - **Show Avatars** `yesNo` Default: `no`
 	- _If disabled, a list of usernames will be displayed._
+- **Show Avatars to Guests** `yesNo` Default: `no`
+	- _If disabled, a list of usernames will be displayed to guests._
 - **Order By** `radio` Default: `username`
 	- _Order criteria to use: ordering by username could be faster._
 - **Order On Ascending Order** `yesNo` Default: `no`

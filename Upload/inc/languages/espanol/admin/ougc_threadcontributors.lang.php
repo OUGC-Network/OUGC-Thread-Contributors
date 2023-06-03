@@ -33,6 +33,8 @@ $l['setting_group_ougc_threadcontributors_desc'] = 'Muestra un listado de usuari
 // Settings
 $l['setting_ougc_threadcontributors_showavatars'] = 'Mostrar Avatares';
 $l['setting_ougc_threadcontributors_showavatars_desc'] = 'Si se desactiva, se mostrara solo el nombre de usuario.';
+$l['setting_ougc_threadcontributors_showavatars_guests'] = 'Mostrar Avatares a Invitados';
+$l['setting_ougc_threadcontributors_showavatars_guests_desc'] = 'Si se desactiva, se mostrara solo el nombre de usuario para los invitados.';
 $l['setting_ougc_threadcontributors_orderby'] = 'Ordenar Por';
 $l['setting_ougc_threadcontributors_orderby_desc'] = 'Criterio de orden a user: ordenar por nombre podría ser mas rapido.';
 $l['setting_ougc_threadcontributors_orderby_username'] = 'Nombre de usuario';

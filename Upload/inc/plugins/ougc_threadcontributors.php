@@ -279,7 +279,14 @@ function ougc_threadcontributors_showthread(): void
         ]
     );
 
-    $showavatars = $mybb->settings['ougc_threadcontributors_showavatars'] && $mybb->user['showavatars'];
+    $showavatars = true;
+
+    if (!$mybb->settings['ougc_threadcontributors_showavatars'] || (
+            $mybb->user['uid'] && !$mybb->user['showavatars'] ||
+            !$mybb->user['uid'] && !$mybb->settings['ougc_threadcontributors_showavatars_guests']
+        )) {
+        $showavatars = false;
+    }
 
     $max_dimension = (int)$mybb->settings['ougc_threadcontributors_maxsize'];
 
