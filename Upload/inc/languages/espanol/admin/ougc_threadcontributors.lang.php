@@ -44,6 +44,8 @@ $l['setting_ougc_threadcontributors_ignoreauthor'] = 'Ignorar Autores';
 $l['setting_ougc_threadcontributors_ignoreauthor_desc'] = 'Selecciona si el creador del tema debe ser ignorado en el listado de usuarios.';
 $l['setting_ougc_threadcontributors_maxsize'] = 'Dimensiones Maximas';
 $l['setting_ougc_threadcontributors_maxsize_desc'] = 'Por favor selecciona las dimensiones maximas tanto para el ancho como el alto de la imagen.';
+$l['setting_ougc_threadcontributors_allowPostFiltering'] = 'Permitir Filtrado de Mensajes (Experimental)';
+$l['setting_ougc_threadcontributors_allowPostFiltering_desc'] = "Si se activa, la lista de usuarios enlazara al mismo tema con un filtro para mostrar solo los mensajes del usuario. Si se desactiva, acceso al filtro no será permitido.";
 
 // PluginLibrary
 $l['ougc_threadcontributors_pl_required'] = 'Este complemento require la version {2} de <a href="{1}">PluginLibrary</a>. Por favor instala los archivos necesarios.';

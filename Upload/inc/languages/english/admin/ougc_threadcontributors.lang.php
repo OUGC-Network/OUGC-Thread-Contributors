@@ -44,6 +44,8 @@ $l['setting_ougc_threadcontributors_ignoreauthor'] = 'Ignore Authors';
 $l['setting_ougc_threadcontributors_ignoreauthor_desc'] = 'Should the contributor list ignore the thread author?';
 $l['setting_ougc_threadcontributors_maxsize'] = 'Maximum Width and Height Size';
 $l['setting_ougc_threadcontributors_maxsize_desc'] = 'Please input the maximum image size for both the width and height.';
+$l['setting_ougc_threadcontributors_allowPostFiltering'] = 'Allow Post Filtering (Experimental)';
+$l['setting_ougc_threadcontributors_allowPostFiltering_desc'] = "If enabled, user list will link to the same thread filtered to display the user's posts. If disabled, the filtering wil not be accessible.";
 
 // PluginLibrary
 $l['ougc_threadcontributors_pl_required'] = 'This plugin requires <a href="{1}">PluginLibrary</a> version {2} or later to be uploaded to your forum.';

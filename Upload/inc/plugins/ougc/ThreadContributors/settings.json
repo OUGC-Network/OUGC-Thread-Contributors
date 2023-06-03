@@ -22,5 +22,9 @@
     "maxsize": {
         "optionscode": "numeric",
         "value": 30
+    },
+    "allowPostFiltering": {
+        "optionscode": "yesno",
+        "value": 0
     }
 }

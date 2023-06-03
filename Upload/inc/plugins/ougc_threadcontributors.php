@@ -331,17 +331,24 @@ function ougc_threadcontributors_showthread()
     $done_users = [];
 
     while ($user = $db->fetch_array($query, 'pid')) {
-        if (isset($done_users[$user['uid']])) {
+        $uid = (int)$user['uid'];
+
+        if (isset($done_users[$uid])) {
             continue;
         }
 
-        $done_users[$user['uid']] = true;
+        $done_users[$uid] = true;
 
         $user['username'] = htmlspecialchars_uni($user['username']);
 
         $date = my_date('relative', $user['dateline']);
 
-        $user['profilelink'] = get_profile_link($user['uid']);
+        if ($mybb->settings['ougc_threadcontributors_allowPostFiltering']) {
+            $user['profilelink'] = get_thread_link($thread['tid'], 0, 'thread') . "&amp;otc_filter={$uid}";
+        } else {
+            $user['profilelink'] = get_profile_link($uid);
+        }
+
         $user['username_formatted'] = format_name($user['username'], $user['usergroup'], $user['displaygroup']);
 
         if ($showavatars) {
@@ -381,6 +388,8 @@ class OUGC_ThreadContributors
             $plugins->add_hook('class_moderation_unapprove_posts', [$this, 'hook_class_moderation_approve_posts']);
             $plugins->add_hook('class_moderation_soft_delete_posts', [$this, 'hook_class_moderation_approve_posts']);
             $plugins->add_hook('class_moderation_restore_posts', [$this, 'hook_class_moderation_approve_posts']);
+            $plugins->add_hook('showthread_end', 'ougc_threadcontributors_showthread');
+            $plugins->add_hook('showthread_start', [$this, 'hook_showthread_start']);
             $plugins->add_hook('datahandler_post_insert_post_end', [$this, 'hook_datahandler_post_insert_post_end']);
             $plugins->add_hook('datahandler_post_update_end', [$this, 'hook_datahandler_post_insert_post_end']); // perhaps the author changed because of external plugins
         }
@@ -511,6 +520,38 @@ class OUGC_ThreadContributors
                 $this->update_thread();
             }
         }
+    }
+
+    function hook_showthread_start(): void
+    {
+        global $mybb;
+
+        $userID = $mybb->get_input('otc_filter', \MyBB::INPUT_INT);
+
+        if (!$userID || !$mybb->settings['ougc_threadcontributors_allowPostFiltering']) {
+            return;
+        }
+
+        global $plugins, $visibleonly, $visibleonly_p, $visibleonly_p_t;
+
+        $visibleonly .= " AND uid='{$userID}'";
+
+        $visibleonly_p .= " AND p.uid='{$userID}'";
+
+        $visibleonly_p_t .= " AND (p.uid='{$userID}' OR t.uid!='{$userID}')";
+
+        $plugins->add_hook('multipage', [$this, 'hook_multipage']);
+    }
+
+    function hook_multipage(&$arguments): array
+    {
+        global $mybb;
+
+        $userID = $mybb->get_input('otc_filter', \MyBB::INPUT_INT);
+
+        $arguments['url'] .= "&amp;action=thread&amp;otc_filter={$userID}";
+
+        return $arguments;
     }
 
     function hook_datahandler_post_insert_post_end(&$dataHandler): void
