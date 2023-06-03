@@ -85,44 +85,33 @@ function ougc_threadcontributors_activate()
     ougc_threadcontributors_pl_check();
 
     // Add settings group
-    $PL->settings('ougc_threadcontributors', $lang->setting_group_ougc_threadcontributors, $lang->setting_group_ougc_threadcontributors_desc, [
-        'showavatars' => [
-            'title' => $lang->setting_ougc_threadcontributors_showavatars,
-            'description' => $lang->setting_ougc_threadcontributors_showavatars_desc,
-            'optionscode' => 'yesno',
-            'value' => 0,
-        ],
-        'orderby' => [
-            'title' => $lang->setting_ougc_threadcontributors_orderby,
-            'description' => $lang->setting_ougc_threadcontributors_orderby_desc,
-            'optionscode' => "radio
-username={$lang->setting_ougc_threadcontributors_orderby_username}
-posttime={$lang->setting_ougc_threadcontributors_orderby_posttime}",
-            'value' => 'username',
-        ],
-        'orderdir' => [
-            'title' => $lang->setting_ougc_threadcontributors_orderdir,
-            'description' => $lang->setting_ougc_threadcontributors_orderdir_desc,
-            'optionscode' => 'yesno',
-            'value' => 0,
-        ],
-        'ignoreauthor' => [
-            'title' => $lang->setting_ougc_threadcontributors_ignoreauthor,
-            'description' => $lang->setting_ougc_threadcontributors_ignoreauthor_desc,
-            'optionscode' => 'yesno',
-            'value' => 0,
-        ],
-        'maxsize' => [
-            'title' => $lang->setting_ougc_threadcontributors_maxsize,
-            'description' => $lang->setting_ougc_threadcontributors_maxsize_desc,
-            'optionscode' => 'numeric',
-            'value' => 30,
-        ]
-    ]);
+    $settingsContents = \file_get_contents(OUGC_THREAD_CONTRIBUTORS_ROOT . '/settings.json');
 
+    $settingsData = \json_decode($settingsContents, true);
+
+    foreach ($settingsData as $settingKey => &$settingData) {
+        if (empty($lang->{"setting_ougc_threadcontributors_{$settingKey}"})) {
+            continue;
+        }
+
+        if ($settingData['optionscode'] == 'radio') {
+            foreach ($settingData['options'] as $optionKey) {
+                $settingData['optionscode'] .= "\n{$optionKey}={$lang->{"setting_ougc_threadcontributors_{$settingKey}_{$optionKey}"}}";
+            }
+        }
+
+        $settingData['title'] = $lang->{"setting_ougc_threadcontributors_{$settingKey}"};
+        $settingData['description'] = $lang->{"setting_ougc_threadcontributors_{$settingKey}_desc"};
+    }
 
     // Modify templates
     require_once MYBB_ROOT . '/inc/adminfunctions_templates.php';
+    $PL->settings(
+        'ougc_threadcontributors',
+        $lang->setting_group_ougc_threadcontributors,
+        $lang->setting_group_ougc_threadcontributors_desc,
+        $settingsData
+    );
 
     find_replace_templatesets('showthread', '#' . preg_quote('{$usersbrowsing}') . '#', '{$usersbrowsing}{$ougc_threadcontributors_list}');
     // Add templates
