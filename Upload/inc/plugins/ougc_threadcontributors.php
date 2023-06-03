@@ -104,8 +104,6 @@ function ougc_threadcontributors_activate()
         $settingData['description'] = $lang->{"setting_ougc_threadcontributors_{$settingKey}_desc"};
     }
 
-    // Modify templates
-    require_once MYBB_ROOT . '/inc/adminfunctions_templates.php';
     $PL->settings(
         'ougc_threadcontributors',
         $lang->setting_group_ougc_threadcontributors,
@@ -113,7 +111,6 @@ function ougc_threadcontributors_activate()
         $settingsData
     );
 
-    find_replace_templatesets('showthread', '#' . preg_quote('{$usersbrowsing}') . '#', '{$usersbrowsing}{$ougc_threadcontributors_list}');
     // Add templates
     $templatesDirIterator = new \DirectoryIterator(OUGC_THREAD_CONTRIBUTORS_ROOT . '/templates');
 
@@ -159,21 +156,6 @@ function ougc_threadcontributors_activate()
     $plugins['threadcontributors'] = $info['versioncode'];
 
     $cache->update('ougc_plugins', $plugins);
-}
-
-// _deactivate() routine
-function ougc_threadcontributors_deactivate()
-{
-    global $cache;
-
-    ougc_threadcontributors_pl_check();
-
-    // Revert template edits
-    require_once MYBB_ROOT . '/inc/adminfunctions_templates.php';
-
-    find_replace_templatesets('showthread', '#' . preg_quote('{$ougc_threadcontributors_list}') . '#', '', 0);
-
-    find_replace_templatesets('showthread', '#' . preg_quote('{$ougc_threadcontributors}') . '#', '', 0);
 }
 
 // _uninstall() routine
