@@ -29,21 +29,21 @@
 
 // Plugin API
 $l['setting_group_ougc_threadcontributors'] = 'OUGC Thread Contributors';
-$l['setting_group_ougc_threadcontributors_desc'] = 'Shows a list of users who contributed to a thread discussion.';
+$l['setting_group_ougc_threadcontributors_desc'] = 'Displays a list of users who contributed to a discussion.';
 
 // Settings
-$l['setting_ougc_threadcontributors_showavatars'] = 'Show Users Avatars';
-$l['setting_ougc_threadcontributors_showavatars_desc'] = 'If set to no a list of user names will be displayed.';
+$l['setting_ougc_threadcontributors_showavatars'] = 'Show Avatars';
+$l['setting_ougc_threadcontributors_showavatars_desc'] = 'If disabled, a list of usernames will be displayed.';
 $l['setting_ougc_threadcontributors_orderby'] = 'Order By';
-$l['setting_ougc_threadcontributors_orderby_desc'] = 'Please select the order by field to use.';
+$l['setting_ougc_threadcontributors_orderby_desc'] = 'Order criteria to use: ordering by username could be faster.';
 $l['setting_ougc_threadcontributors_orderby_username'] = 'Username';
 $l['setting_ougc_threadcontributors_orderby_posttime'] = 'Post Time';
 $l['setting_ougc_threadcontributors_orderdir'] = 'Order On Ascending Order';
-$l['setting_ougc_threadcontributors_orderdir_desc'] = 'Select if you want to reverse the ordering of users.';
+$l['setting_ougc_threadcontributors_orderdir_desc'] = 'If enabled, the order of users will be reversed.';
 $l['setting_ougc_threadcontributors_ignoreauthor'] = 'Ignore Authors';
-$l['setting_ougc_threadcontributors_ignoreauthor_desc'] = 'Should the contributor list ignore the thread author?';
-$l['setting_ougc_threadcontributors_maxsize'] = 'Maximum Width and Height Size';
-$l['setting_ougc_threadcontributors_maxsize_desc'] = 'Please input the maximum image size for both the width and height.';
+$l['setting_ougc_threadcontributors_ignoreauthor_desc'] = 'If enabled, the thread author will not be displayed in the contributors list.';
+$l['setting_ougc_threadcontributors_maxsize'] = 'Avatar Maximum Dimensions';
+$l['setting_ougc_threadcontributors_maxsize_desc'] = 'Set the maximum avatar width and height size.';
 $l['setting_ougc_threadcontributors_allowPostFiltering'] = 'Allow Post Filtering (Experimental)';
 $l['setting_ougc_threadcontributors_allowPostFiltering_desc'] = "If enabled, user list will link to the same thread filtered to display the user's posts. If disabled, the filtering wil not be accessible.";
 

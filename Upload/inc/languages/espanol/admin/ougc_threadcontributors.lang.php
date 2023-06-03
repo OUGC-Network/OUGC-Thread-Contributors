@@ -33,17 +33,17 @@ $l['setting_group_ougc_threadcontributors_desc'] = 'Muestra un listado de usuari
 
 // Settings
 $l['setting_ougc_threadcontributors_showavatars'] = 'Mostrar Avatares';
-$l['setting_ougc_threadcontributors_showavatars_desc'] = 'Si se desactiva esta opción se mostrara solo el nombre de usuario.';
+$l['setting_ougc_threadcontributors_showavatars_desc'] = 'Si se desactiva, se mostrara solo el nombre de usuario.';
 $l['setting_ougc_threadcontributors_orderby'] = 'Ordenar Por';
-$l['setting_ougc_threadcontributors_orderby_desc'] = 'Por favor selecciona el campo por el cual ordenar a los usuarios.';
+$l['setting_ougc_threadcontributors_orderby_desc'] = 'Criterio de orden a user: ordenar por nombre podría ser mas rapido.';
 $l['setting_ougc_threadcontributors_orderby_username'] = 'Nombre de usuario';
 $l['setting_ougc_threadcontributors_orderby_posttime'] = 'Fecha del mensaje';
 $l['setting_ougc_threadcontributors_orderdir'] = 'Revertir el Orden';
-$l['setting_ougc_threadcontributors_orderdir_desc'] = 'Selecciona si quieres revertir el orden de los usuarios.';
+$l['setting_ougc_threadcontributors_orderdir_desc'] = 'Si se desactiva, el orden de los usuarios sera invertido.';
 $l['setting_ougc_threadcontributors_ignoreauthor'] = 'Ignorar Autores';
-$l['setting_ougc_threadcontributors_ignoreauthor_desc'] = 'Selecciona si el creador del tema debe ser ignorado en el listado de usuarios.';
-$l['setting_ougc_threadcontributors_maxsize'] = 'Dimensiones Maximas';
-$l['setting_ougc_threadcontributors_maxsize_desc'] = 'Por favor selecciona las dimensiones maximas tanto para el ancho como el alto de la imagen.';
+$l['setting_ougc_threadcontributors_ignoreauthor_desc'] = 'Si se activa, el autor del tema no sera mostrado en la lista de colaboradores.';
+$l['setting_ougc_threadcontributors_maxsize'] = 'Dimensiones Maximas del Avatar';
+$l['setting_ougc_threadcontributors_maxsize_desc'] = 'Selecciona el ancho y alto maximas para los avatares.';
 $l['setting_ougc_threadcontributors_allowPostFiltering'] = 'Permitir Filtrado de Mensajes (Experimental)';
 $l['setting_ougc_threadcontributors_allowPostFiltering_desc'] = "Si se activa, la lista de usuarios enlazara al mismo tema con un filtro para mostrar solo los mensajes del usuario. Si se desactiva, acceso al filtro no será permitido.";
 
