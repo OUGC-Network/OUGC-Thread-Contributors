@@ -39,7 +39,7 @@
 
 ## 🚀 About <a name = "about"></a>
 
-OUGC Contact Thread is a MyBB plugin designed to streamline communication on your forum. With this easy-to-use script, whenever a user submits a message via the contact form, a dedicated thread is automatically created within a specified forum. By redirecting contact messages to the forum, the plugin reduces the volume of emails sent, making communication more efficient and organized.
+OUGC Thread Contributors is a MyBB plugin designed to enhance user engagement and provide a comprehensive overview of thread participants. With this simple plugin, users can easily access a list of contributors who have posted or commented within a thread. The list ensures an accurate representation of participant involvement, fostering greater interaction and community engagement
 
 [Go up to Table of Contents](#table_of_contents)
 
