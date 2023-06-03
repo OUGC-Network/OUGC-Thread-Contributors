@@ -31,6 +31,7 @@
 	- [Update](#update)
 	- [Template Modifications](#template_modifications)
 - [Settings](#settings)
+- [Templates](#templates)
 - [Usage](#usage)
 - [Built Using](#built_using)
 - [Authors](#authors)
@@ -132,6 +133,24 @@ Below you can find a description of the plugin settings.
 - **Allow Post Filtering (Experimental)** `yesNo` Default: `no`
 	- _If enabled, user list will link to the same thread filtered to display the user's posts. If disabled, the
 	  filtering wil not be accessible._
+
+[Go up to Table of Contents](#table_of_contents)
+
+## 📐 Templates <a name = "templates"></a>
+
+The following is a list of templates available for this plugin. Uncommon in plugins, we use some templates exclusively for the
+_Administrator Control Panel_.
+
+- `ougcthreadcontributors`
+	- _front end_; used to wrap the user list
+- `ougcthreadcontributors_user`
+	- _front end_; used once for each user
+- `ougcthreadcontributors_user_avatar`
+	- _front end_; used when avatars are displayed
+- `ougcthreadcontributors_user_plain`
+	- _front end_; used when avatars are disabled
+- `ougcthreadcontributors_user_postcount`
+	- _front end_; used when displaying the post count
 
 [Go up to Table of Contents](#table_of_contents)
 
