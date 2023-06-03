@@ -3,12 +3,12 @@
 /***************************************************************************
  *
  *   OUGC Thread Contributors plugin (/inc/plugins/ougc_threadcontributors.php)
- *     Author: Omar Gonzalez
- *   Copyright: © 2014-2020 Omar Gonzalez
+ *   Author: Omar Gonzalez
+ *   Copyright: © 2014-2023 Omar Gonzalez
  *
  *   Website: https://ougc.network
  *
- *   Shows a list of users who contributed to a thread discussion.
+ *   Displays a list of users who contributed to a discussion.
  *
  ***************************************************************************
  ****************************************************************************
@@ -26,34 +26,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
+declare(strict_types=1);
+
 // Die if IN_MYBB is not defined, for security reasons.
-defined('IN_MYBB') or die('Direct initialization of this file is not allowed.');
-
-// PLUGINLIBRARY
-defined('PLUGINLIBRARY') or define('PLUGINLIBRARY', MYBB_ROOT . 'inc/plugins/pluginlibrary.php');
-
-
-    $plugins->add_hook('showthread_end', 'ougc_threadcontributors_showthread');
+if (!defined('IN_MYBB')) {
+    die('This file cannot be accessed directly.');
 }
 
+const OUGC_THREAD_CONTRIBUTORS_ROOT = MYBB_ROOT . 'inc/plugins/ougc/ThreadContributors';
+
 // PLUGINLIBRARY
-defined('PLUGINLIBRARY') or define('PLUGINLIBRARY', MYBB_ROOT . 'inc/plugins/pluginlibrary.php');
+if (!defined('PLUGINLIBRARY')) {
+    define('PLUGINLIBRARY', MYBB_ROOT . 'inc/plugins/pluginlibrary.php');
+}
 
 // Necessary plugin information for the ACP plugin manager.
-function ougc_threadcontributors_info()
+function ougc_threadcontributors_info(): array
 {
     global $lang;
+
     ougc_threadcontributors_lang_load();
 
     return [
         'name' => 'OUGC Thread Contributors',
         'description' => $lang->setting_group_ougc_threadcontributors,
-        'website' => 'https://ougc.network',
+        'website' => 'https://community.mybb.com/mods.php?action=view&pid=1375',
         'author' => 'Omar G.',
         'authorsite' => 'https://ougc.network',
-        'version' => '1.8.22',
-        'versioncode' => 1822,
-        'compatibility' => '18*',
+        'version' => '1.8.33',
+        'versioncode' => 1833,
+        'compatibility' => '183*',
         'codename' => 'ougc_threadcontributors',
         'pl' => [
             'version' => 13,
@@ -63,7 +65,7 @@ function ougc_threadcontributors_info()
 }
 
 // _activate() routine
-function ougc_threadcontributors_activate()
+function ougc_threadcontributors_activate(): void
 {
     global $PL, $cache, $lang, $ougc_threadcontributors;
 
@@ -120,16 +122,12 @@ function ougc_threadcontributors_activate()
     }
 
     // Insert/update version into cache
-    $plugins = $cache->read('ougc_plugins');
+    $plugins = (array)$cache->read('ougc_plugins');
 
-    if (!$plugins) {
-        $plugins = [];
-    }
-
-    $info = ougc_threadcontributors_info();
+    $versionCode = ougc_threadcontributors_info()['versioncode'];
 
     if (!isset($plugins['threadcontributors'])) {
-        $plugins['threadcontributors'] = $info['versioncode'];
+        $plugins['threadcontributors'] = $versionCode;
     }
 
     $ougc_threadcontributors->_db_verify_columns();
@@ -138,21 +136,13 @@ function ougc_threadcontributors_activate()
 
     /*~*~* RUN UPDATES END *~*~*/
 
-    $plugins['threadcontributors'] = $info['versioncode'];
+    $plugins['threadcontributors'] = $versionCode;
 
     $cache->update('ougc_plugins', $plugins);
 }
 
-// _uninstall() routine
-function ougc_threadcontributors_install()
-{
-    global $ougc_threadcontributors;
-
-    $ougc_threadcontributors->_db_verify_columns();
-}
-
 // _is_installed() routine
-function ougc_threadcontributors_is_installed()
+function ougc_threadcontributors_is_installed(): bool
 {
     global $ougc_threadcontributors;
 
@@ -160,11 +150,13 @@ function ougc_threadcontributors_is_installed()
 }
 
 // _uninstall() routine
-function ougc_threadcontributors_uninstall()
+function ougc_threadcontributors_uninstall(): void
 {
     global $PL, $cache, $ougc_threadcontributors, $db;
 
-    ougc_threadcontributors_pl_check();
+    if (!($PL instanceof \PluginLibrary)) {
+        require_once \PLUGINLIBRARY;
+    }
 
     foreach ($ougc_threadcontributors->_db_columns() as $table => $columns) {
         foreach ($columns as $name => $definition) {
@@ -186,60 +178,58 @@ function ougc_threadcontributors_uninstall()
     if (!empty($plugins)) {
         $cache->update('ougc_plugins', $plugins);
     } else {
-        $cache->delete('ougc_plugins');
+        $PL->cache_delete('ougc_plugins');
     }
 }
 
 // PluginLibrary dependency check & load
-function ougc_threadcontributors_pl_check()
+function ougc_threadcontributors_pl_check(): void
 {
-    global $lang;
+    global $PL, $lang;
 
     ougc_threadcontributors_lang_load();
 
     $info = ougc_threadcontributors_info();
 
-    if ($file_exists = file_exists(PLUGINLIBRARY)) {
-        global $PL;
+    $fileExists = file_exists(\PLUGINLIBRARY);
 
-        $PL or require_once PLUGINLIBRARY;
+    if ($fileExists && !($PL instanceof \PluginLibrary)) {
+        require_once \PLUGINLIBRARY;
     }
 
-    if (!$file_exists || $PL->version < $info['pl']['version']) {
-        flash_message($lang->sprintf($lang->ougc_threadcontributors_pl_required, $info['pl']['url'], $info['pl']['version']), 'error');
-        admin_redirect('index.php?module=config-plugins');
-    }
-}
+    if (!$fileExists || $PL->version < $info['pl']['version']) {
+        \flash_message(
+            $lang->sprintf(
+                $lang->ougc_threadcontributors_pl_required,
+                $info['pl']['ulr'],
+                $info['pl']['version']
+            ),
+            'error'
+        );
 
-// Pretty settings
-function ougc_threadcontributors_settings_change()
-{
-    global $db, $mybb;
-
-    $query = $db->simple_select('settinggroups', 'name', 'gid=\'' . (int)$mybb->input['gid'] . '\'');
-    $groupname = $db->fetch_field($query, 'name');
-
-    if ($groupname == 'ougc_threadcontributors') {
-        ougc_threadcontributors_lang_load();
+        \admin_redirect('index.php?module=config-plugins');
     }
 }
 
 // Load language file
-function ougc_threadcontributors_lang_load()
+function ougc_threadcontributors_lang_load(): void
 {
     global $lang;
 
-    isset($lang->setting_group_ougc_threadcontributors) or $lang->load('ougc_threadcontributors');
+    if (!isset($lang->setting_group_ougc_threadcontributors)) {
+        $lang->load('ougc_threadcontributors');
+    }
 }
 
 // Dark magic
-function ougc_threadcontributors_showthread()
+function ougc_threadcontributors_showthread(): void
 {
-    global $db, $tid, $visible, $mybb, $templates, $ougc_threadcontributors_list, $ougc_threadcontributors, $lang, $thread;
+    global $db, $tid, $mybb, $templates, $lang, $thread;
+    global $ougc_threadcontributors_list, $ougc_threadcontributors;
 
     ougc_threadcontributors_lang_load();
 
-    $comma = $ougc_threadcontributors_list = $where = $users = '';
+    $comma = $ougc_threadcontributors_list = $users = '';
 
     $orderdir = 'DESC';
 
@@ -247,13 +237,13 @@ function ougc_threadcontributors_showthread()
         $orderdir = 'ASC';
     }
 
+    $tid = (int)$tid;
+
     if (empty($thread['ougc_threadcontributors'])) {
         $ougc_threadcontributors->set_update_thread($tid);
 
         $uids = $ougc_threadcontributors->update_thread();
-    }
-
-    if (empty($uids)) {
+    } else {
         $uids = array_map('intval', explode(',', $thread['ougc_threadcontributors']));
     }
 
@@ -261,33 +251,33 @@ function ougc_threadcontributors_showthread()
 
     $author = (int)$thread['uid'];
 
-    if ($mybb->settings['ougc_threadcontributors_orderby'] == 'posttime') {
-        if ($mybb->settings['ougc_threadcontributors_ignoreauthor']) {
-            $where = " AND u.uid!='{$author}'";
-        }
+    $where = ["u.uid IN ('{$uids}')"];
 
-        $query = $db->query("
-			SELECT u.uid, u.username, u.avatar, u.avatardimensions, u.usergroup, u.displaygroup
-			FROM " . TABLE_PREFIX . "posts p
-			LEFT JOIN " . TABLE_PREFIX . "users u ON (u.uid=p.uid)
-			WHERE p.tid='{$tid}' AND u.uid IN ('{$uids}'){$where}
-			ORDER BY p.dateline {$orderdir}
-		");
-    } else {
-        if ($mybb->settings['ougc_threadcontributors_ignoreauthor']) {
-            $where = " AND uid!='{$author}'";
-        }
-
-        $query = $db->simple_select(
-            'users',
-            'uid, username, avatar, avatardimensions, usergroup, displaygroup',
-            "uid IN ('{$uids}'){$where}",
-            [
-                'order_by' => 'username',
-                'order_dir' => $orderdir
-            ]
-        );
+    if ($mybb->settings['ougc_threadcontributors_ignoreauthor']) {
+        $where[] = "u.uid!='{$author}'";
     }
+
+    $queryTable = 'users u';
+
+    $orderBy = 'u.username';
+
+    if ($mybb->settings['ougc_threadcontributors_orderby'] == 'posttime') {
+        $where[] = "p.tid='{$tid}'";
+
+        $queryTable = "posts p LEFT JOIN {$db->table_prefix}users u ON (u.uid=p.uid)";
+
+        $orderBy = 'p.dateline';
+    }
+
+    $query = $db->simple_select(
+        $queryTable,
+        'u.uid, u.username, u.avatar, u.avatardimensions, u.usergroup, u.displaygroup',
+        implode(' AND ', $where),
+        [
+            'order_by' => $orderBy,
+            'order_dir' => $orderdir
+        ]
+    );
 
     $showavatars = $mybb->settings['ougc_threadcontributors_showavatars'] && $mybb->user['showavatars'];
 
@@ -308,7 +298,7 @@ function ougc_threadcontributors_showthread()
 
         $user['username'] = htmlspecialchars_uni($user['username']);
 
-        $date = my_date('relative', $user['dateline']);
+        //$date = my_date('relative', $user['dateline']);
 
         if ($mybb->settings['ougc_threadcontributors_allowPostFiltering']) {
             $user['profilelink'] = get_thread_link($thread['tid'], 0, 'thread') . "&amp;otc_filter={$uid}";
@@ -328,7 +318,9 @@ function ougc_threadcontributors_showthread()
 
         $users .= eval($templates->render('ougcthreadcontributors_user'));
 
-        $comma = $showavatars ? ' ' : $lang->ougc_threadcontributors_comma . ' ';
+        if (!$showavatars) {
+            $comma = $lang->ougc_threadcontributors_comma;
+        }
     }
 
     if ($users) {
@@ -377,7 +369,7 @@ class OUGC_ThreadContributors
     }
 
     // Plugin API:_is_installed() routine
-    function _is_installed()
+    function _is_installed(): bool
     {
         global $db;
 
@@ -393,19 +385,17 @@ class OUGC_ThreadContributors
     }
 
     // List of columns
-    function _db_columns()
+    function _db_columns(): array
     {
-        $tables = [
+        return [
             'threads' => [
                 'ougc_threadcontributors' => "text NULL"
             ],
         ];
-
-        return $tables;
     }
 
     // Verify DB columns
-    function _db_verify_columns()
+    function _db_verify_columns(): void
     {
         global $db;
 
@@ -420,17 +410,17 @@ class OUGC_ThreadContributors
         }
     }
 
-    function update_thread()
+    function update_thread(): array
     {
         global $db;
 
+        $uids = [];
+
         if (!($tid = $this->get_update_thread())) {
-            return false;
+            return $uids;
         }
 
         $query = $db->simple_select('posts', 'uid', "tid='{$tid}' AND visible='1'");
-
-        $uids = [];
 
         while ($uid = $db->fetch_field($query, 'uid')) {
             $uid = (int)$uid;
@@ -445,42 +435,44 @@ class OUGC_ThreadContributors
         return $uids;
     }
 
-    function set_update_thread($tid)
+    function set_update_thread(int $tid): void
     {
         $this->update_thread = (int)$tid;
     }
 
-    function get_update_thread()
+    function get_update_thread(): int
     {
         return $this->update_thread;
     }
 
-    function hook_class_moderation_delete_post_start(&$pid)
+    function hook_class_moderation_delete_post_start(&$pid): void
     {
         global $plugins;
 
         $post = get_post($pid);
 
-        $thread = get_thread($post['tid']);
+        $tid = (int)$post['tid'];
 
-        $this->set_update_thread($thread['tid']);
+        $this->set_update_thread($tid);
 
         $plugins->add_hook('class_moderation_delete_post', [$this, 'hook_class_moderation_delete_post']);
     }
 
-    function hook_class_moderation_delete_post(&$pid)
+    function hook_class_moderation_delete_post(&$pid): void
     {
         $this->update_thread();
     }
 
-    function hook_class_moderation_merge_posts(&$args)
+    function hook_class_moderation_merge_posts(&$args): void
     {
-        $this->set_update_thread($args['tid']);
+        $tid = (int)$args['tid'];
+
+        $this->set_update_thread($tid);
 
         $this->update_thread();
     }
 
-    function hook_class_moderation_approve_posts(&$pids)
+    function hook_class_moderation_approve_posts(&$pids): void
     {
         if (!empty($pids)) {
             global $db;
@@ -524,7 +516,7 @@ class OUGC_ThreadContributors
         $plugins->add_hook('multipage', [$this, 'hook_multipage']);
     }
 
-    function hook_multipage(&$arguments): array
+    function hook_multipage(array &$arguments): array
     {
         global $mybb;
 
@@ -535,10 +527,12 @@ class OUGC_ThreadContributors
         return $arguments;
     }
 
-    function hook_datahandler_post_insert_post_end(&$dataHandler): void
+    function hook_datahandler_post_insert_post_end(\PostDataHandler &$dataHandler): void
     {
         if (!empty($dataHandler->data['tid'])) {
-            $this->set_update_thread($dataHandler->data['tid']);
+            $tid = (int)$dataHandler->data['tid'];
+
+            $this->set_update_thread($tid);
 
             $this->update_thread();
         }
