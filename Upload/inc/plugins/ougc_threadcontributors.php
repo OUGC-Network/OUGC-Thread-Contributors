@@ -32,21 +32,6 @@ defined('IN_MYBB') or die('Direct initialization of this file is not allowed.');
 // PLUGINLIBRARY
 defined('PLUGINLIBRARY') or define('PLUGINLIBRARY', MYBB_ROOT . 'inc/plugins/pluginlibrary.php');
 
-// Add our hook
-if (defined('IN_ADMINCP')) {
-    $plugins->add_hook('admin_config_settings_start', 'ougc_threadcontributors_lang_load');
-    $plugins->add_hook('admin_style_templates_set', 'ougc_threadcontributors_lang_load');
-    $plugins->add_hook('admin_config_settings_change', 'ougc_threadcontributors_settings_change');
-} else {
-    global $templatelist;
-
-    if (isset($templatelist)) {
-        $templatelist .= ',';
-    } else {
-        $templatelist = '';
-    }
-
-    $templatelist .= 'ougcthreadcontributors, ougcthreadcontributors_user, ougcthreadcontributors_user_avatar, ougcthreadcontributors_user_plain';
 
     $plugins->add_hook('showthread_end', 'ougc_threadcontributors_showthread');
 }
@@ -358,10 +343,15 @@ class OUGC_ThreadContributors
 
     function __construct()
     {
-        global $plugins, $settings, $templatelist;
+        global $plugins;
+        global $templatelist;
 
         // Tell MyBB when to run the hook
-        if (!defined('IN_ADMINCP')) {
+        if (defined('IN_ADMINCP')) {
+            $plugins->add_hook('admin_config_settings_start', 'ougc_threadcontributors_lang_load');
+            $plugins->add_hook('admin_style_templates_set', 'ougc_threadcontributors_lang_load');
+            $plugins->add_hook('admin_config_settings_change', 'ougc_threadcontributors_lang_load');
+        } else {
             $plugins->add_hook('class_moderation_delete_post', [$this, 'hook_class_moderation_delete_post_start']);
             $plugins->add_hook('class_moderation_merge_posts', [$this, 'hook_class_moderation_merge_posts']);
             $plugins->add_hook('class_moderation_merge_threads', [$this, 'hook_class_moderation_merge_posts']);
@@ -374,6 +364,15 @@ class OUGC_ThreadContributors
             $plugins->add_hook('showthread_start', [$this, 'hook_showthread_start']);
             $plugins->add_hook('datahandler_post_insert_post_end', [$this, 'hook_datahandler_post_insert_post_end']);
             $plugins->add_hook('datahandler_post_update_end', [$this, 'hook_datahandler_post_insert_post_end']); // perhaps the author changed because of external plugins
+
+            if (isset($templatelist)) {
+                $templatelist .= ',';
+            } else {
+                $templatelist = '';
+            }
+
+            $templatelist .= 'ougcthreadcontributors, ougcthreadcontributors_user, ougcthreadcontributors_user_avatar, ougcthreadcontributors_user_plain';
+
         }
     }
 
