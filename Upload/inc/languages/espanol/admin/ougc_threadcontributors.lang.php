@@ -41,6 +41,7 @@ $l['setting_ougc_threadcontributors_orderby'] = 'Ordenar Por';
 $l['setting_ougc_threadcontributors_orderby_desc'] = 'Criterio de orden a user: ordenar por nombre podría ser mas rapido.';
 $l['setting_ougc_threadcontributors_orderby_username'] = 'Nombre de usuario';
 $l['setting_ougc_threadcontributors_orderby_posttime'] = 'Fecha del mensaje';
+$l['setting_ougc_threadcontributors_orderby_postcount'] = 'Total de mensajes';
 $l['setting_ougc_threadcontributors_orderdir'] = 'Revertir el Orden';
 $l['setting_ougc_threadcontributors_orderdir_desc'] = 'Si se desactiva, el orden de los usuarios sera invertido.';
 $l['setting_ougc_threadcontributors_ignoreauthor'] = 'Ignorar Autores';

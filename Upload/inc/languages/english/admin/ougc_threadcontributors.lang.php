@@ -41,6 +41,7 @@ $l['setting_ougc_threadcontributors_orderby'] = 'Order By';
 $l['setting_ougc_threadcontributors_orderby_desc'] = 'Order criteria to use: ordering by username could be faster.';
 $l['setting_ougc_threadcontributors_orderby_username'] = 'Username';
 $l['setting_ougc_threadcontributors_orderby_posttime'] = 'Post Time';
+$l['setting_ougc_threadcontributors_orderby_postcount'] = 'Post Count';
 $l['setting_ougc_threadcontributors_orderdir'] = 'Order On Ascending Order';
 $l['setting_ougc_threadcontributors_orderdir_desc'] = 'If enabled, the order of users will be reversed.';
 $l['setting_ougc_threadcontributors_ignoreauthor'] = 'Ignore Authors';
