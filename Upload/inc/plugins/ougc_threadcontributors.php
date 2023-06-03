@@ -120,27 +120,33 @@ posttime={$lang->setting_ougc_threadcontributors_orderby_posttime}",
         ]
     ]);
 
-    // Add template group
-    $PL->templates('ougcthreadcontributors', 'OUGC Thread Contributors', [
-        '' => '<br />
-<span class="smalltext">{$lang->ougc_threadcontributors_contributors}: {$users}</span>
-<br />
-<style>
-	.ougcthreadcontributors_user img {
-		border-radius: 50%;
-		max-width: {$max_dimension}px;
-		max-height: {$max_dimension}px;
-	}
-</style>',
-        'user' => '{$comma}<a href="{$user[\'profilelink\']}" title="{$user[\'username\']}" class="ougcthreadcontributors_user">{$dyn}</a>',
-        'user_avatar' => '<img src="{$avatar[\'image\']}" alt="{$user[\'username\']}" {$avatar[\'width_height\']} />',
-        'user_plain' => '{$user[\'username_formatted\']}',
-    ]);
 
     // Modify templates
     require_once MYBB_ROOT . '/inc/adminfunctions_templates.php';
 
     find_replace_templatesets('showthread', '#' . preg_quote('{$usersbrowsing}') . '#', '{$usersbrowsing}{$ougc_threadcontributors_list}');
+    // Add templates
+    $templatesDirIterator = new \DirectoryIterator(OUGC_THREAD_CONTRIBUTORS_ROOT . '/templates');
+
+    $templates = [];
+
+    foreach ($templatesDirIterator as $template) {
+        if (!$template->isFile()) {
+            continue;
+        }
+
+        $pathName = $template->getPathname();
+
+        $pathInfo = \pathinfo($pathName);
+
+        if ($pathInfo['extension'] === 'html') {
+            $templates[$pathInfo['filename']] = \file_get_contents($pathName);
+        }
+    }
+
+    if ($templates) {
+        $PL->templates('ougcthreadcontributors', 'OUGC Thread Contributors', $templates);
+    }
 
     // Insert/update version into cache
     $plugins = $cache->read('ougc_plugins');
