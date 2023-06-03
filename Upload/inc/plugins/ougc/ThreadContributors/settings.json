@@ -1,0 +1,38 @@
+{
+  "showavatars": {
+    "optionscode": "yesno",
+    "value": 0
+  },
+  "showavatars_guests": {
+    "optionscode": "yesno",
+    "value": 1
+  },
+  "count_posts": {
+    "optionscode": "yesno",
+    "value": 0
+  },
+  "orderby": {
+    "optionscode": "radio",
+    "value": "username",
+    "options": {
+      "username": "username",
+      "posttime": "posttime"
+    }
+  },
+  "orderdir": {
+    "optionscode": "yesno",
+    "value": 0
+  },
+  "ignoreauthor": {
+    "optionscode": "yesno",
+    "value": 0
+  },
+  "maxsize": {
+    "optionscode": "numeric",
+    "value": 30
+  },
+  "allowPostFiltering": {
+    "optionscode": "yesno",
+    "value": 0
+  }
+}
