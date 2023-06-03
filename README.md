@@ -68,6 +68,7 @@ A setup that meets the following requirements is necessary to use this plugin.
    │ │ │ │ │ ├── user.html
    │ │ │ │ │ ├── user_avatar.html
    │ │ │ │ │ ├── user_plain.html
+   │ │ │ │ │ ├── user_postcount.html
    │ │ │ │ ├── settings.json
    │ │ ├── ougc_threadcontributors.php.php
    │ ├── languages
@@ -118,6 +119,8 @@ Below you can find a description of the plugin settings.
 	- _If disabled, a list of usernames will be displayed._
 - **Show Avatars to Guests** `yesNo` Default: `no`
 	- _If disabled, a list of usernames will be displayed to guests._
+- **Display Post Count** `yesNo` Default: `no`
+	- _If enabled, the total amount of (visible) posts will be displayed for each user._
 - **Order By** `radio` Default: `username`
 	- _Order criteria to use: ordering by username could be faster._
 - **Order On Ascending Order** `yesNo` Default: `no`

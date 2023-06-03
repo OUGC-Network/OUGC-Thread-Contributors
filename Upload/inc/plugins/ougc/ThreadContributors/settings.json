@@ -7,6 +7,10 @@
     "optionscode": "yesno",
     "value": 1
   },
+  "count_posts": {
+    "optionscode": "yesno",
+    "value": 0
+  },
   "orderby": {
     "optionscode": "radio",
     "value": "username",

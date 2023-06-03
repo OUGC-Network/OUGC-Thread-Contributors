@@ -257,6 +257,24 @@ function ougc_threadcontributors_showthread(): void
         $where[] = "u.uid!='{$author}'";
     }
 
+    $post_count_cache = [];
+
+    if ($mybb->settings['ougc_threadcontributors_count_posts']) {
+        $query = $db->simple_select(
+            "posts p LEFT JOIN {$db->table_prefix}users u ON (u.uid=p.uid)",
+            'p.uid',
+            implode(' AND ', array_merge($where, ["p.tid='{$tid}' AND p.visible='1'"]))
+        );
+
+        while ($uid = (int)$db->fetch_field($query, 'uid')) {
+            if (!isset($post_count_cache[$uid])) {
+                $post_count_cache[$uid] = 0;
+            }
+
+            ++$post_count_cache[$uid];
+        }
+    }
+
     $queryTable = 'users u';
 
     $orderBy = 'u.username';
@@ -323,6 +341,18 @@ function ougc_threadcontributors_showthread(): void
             $dyn = eval($templates->render('ougcthreadcontributors_user_plain', true, false));
         }
 
+        $post_count = '';
+
+        if ($mybb->settings['ougc_threadcontributors_count_posts']) {
+            $posts_count = 0;
+
+            if (isset($post_count_cache[$uid])) {
+                $posts_count = \my_number_format($post_count_cache[$user['uid']]);
+            }
+
+            $post_count = eval($templates->render('ougcthreadcontributors_user_postcount'));
+        }
+
         $users .= eval($templates->render('ougcthreadcontributors_user'));
 
         if (!$showavatars) {
@@ -370,7 +400,7 @@ class OUGC_ThreadContributors
                 $templatelist = '';
             }
 
-            $templatelist .= 'ougcthreadcontributors, ougcthreadcontributors_user, ougcthreadcontributors_user_avatar, ougcthreadcontributors_user_plain';
+            $templatelist .= 'ougcthreadcontributors, ougcthreadcontributors_user, ougcthreadcontributors_user_avatar, ougcthreadcontributors_user_plain, ougcthreadcontributors_user_postcount';
 
         }
     }
