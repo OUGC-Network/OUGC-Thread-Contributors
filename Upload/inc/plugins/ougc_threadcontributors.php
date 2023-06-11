@@ -233,8 +233,12 @@ function ougc_threadcontributors_showthread(): void
 
     $orderdir = 'DESC';
 
+    $sortDirection = SORT_DESC;
+
     if ($mybb->settings['ougc_threadcontributors_orderdir']) {
         $orderdir = 'ASC';
+
+        $sortDirection = SORT_ASC;
     }
 
     $tid = (int)$tid;
@@ -257,24 +261,6 @@ function ougc_threadcontributors_showthread(): void
         $where[] = "u.uid!='{$author}'";
     }
 
-    $post_count_cache = [];
-
-    if ($mybb->settings['ougc_threadcontributors_count_posts']) {
-        $query = $db->simple_select(
-            "posts p LEFT JOIN {$db->table_prefix}users u ON (u.uid=p.uid)",
-            'p.uid',
-            implode(' AND ', array_merge($where, ["p.tid='{$tid}' AND p.visible='1'"]))
-        );
-
-        while ($uid = (int)$db->fetch_field($query, 'uid')) {
-            if (!isset($post_count_cache[$uid])) {
-                $post_count_cache[$uid] = 0;
-            }
-
-            ++$post_count_cache[$uid];
-        }
-    }
-
     $queryTable = 'users u';
 
     $orderBy = 'u.username';
@@ -287,6 +273,8 @@ function ougc_threadcontributors_showthread(): void
         $orderBy = 'p.dateline';
     }
 
+    $usersCache = [];
+
     $query = $db->simple_select(
         $queryTable,
         'u.uid, u.username, u.avatar, u.avatardimensions, u.usergroup, u.displaygroup',
@@ -296,6 +284,30 @@ function ougc_threadcontributors_showthread(): void
             'order_dir' => $orderdir
         ]
     );
+
+    while ($userData = $db->fetch_array($query, 'pid')) {
+        $usersCache[(int)$userData['uid']] = $userData;
+
+        $usersCache[(int)$userData['uid']]['postCount'] = 0;
+    }
+
+    if ($mybb->settings['ougc_threadcontributors_count_posts'] || $mybb->settings['ougc_threadcontributors_orderby'] == 'postcount') {
+        $query = $db->simple_select(
+            "posts p LEFT JOIN {$db->table_prefix}users u ON (u.uid=p.uid)",
+            'p.uid',
+            implode(' AND ', array_merge($where, ["p.tid='{$tid}' AND p.visible='1'"]))
+        );
+
+        while ($uid = (int)$db->fetch_field($query, 'uid')) {
+            ++$usersCache[(int)$uid]['postCount'];
+        }
+
+        if ($mybb->settings['ougc_threadcontributors_orderby'] == 'postcount') {
+            $usersPostsCount = array_column($usersCache, 'postCount');
+
+            array_multisort($usersPostsCount, $sortDirection, $usersCache);
+        }
+    }
 
     $showavatars = true;
 
@@ -312,7 +324,7 @@ function ougc_threadcontributors_showthread(): void
 
     $done_users = [];
 
-    while ($user = $db->fetch_array($query, 'pid')) {
+    foreach ($usersCache as $user) {
         $uid = (int)$user['uid'];
 
         if (isset($done_users[$uid])) {
@@ -344,11 +356,7 @@ function ougc_threadcontributors_showthread(): void
         $post_count = '';
 
         if ($mybb->settings['ougc_threadcontributors_count_posts']) {
-            $posts_count = 0;
-
-            if (isset($post_count_cache[$uid])) {
-                $posts_count = \my_number_format($post_count_cache[$user['uid']]);
-            }
+            $posts_count = \my_number_format($user['postCount']);
 
             $post_count = eval($templates->render('ougcthreadcontributors_user_postcount'));
         }
