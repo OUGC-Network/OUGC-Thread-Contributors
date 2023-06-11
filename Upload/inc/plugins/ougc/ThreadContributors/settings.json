@@ -16,7 +16,8 @@
     "value": "username",
     "options": {
       "username": "username",
-      "posttime": "posttime"
+      "posttime": "posttime",
+      "postcount": "postcount"
     }
   },
   "orderdir": {
