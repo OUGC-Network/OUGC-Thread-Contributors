@@ -568,10 +568,22 @@ class OUGC_ThreadContributors
     function hook_multipage(array &$arguments): array
     {
         global $mybb;
+        global $PL;
+
+        if (!($PL instanceof \PluginLibrary)) {
+            require_once \PLUGINLIBRARY;
+        }
 
         $userID = $mybb->get_input('otc_filter', \MyBB::INPUT_INT);
 
-        $arguments['url'] .= "&amp;action=thread&amp;otc_filter={$userID}";
+        $urlParams = ['otc_filter' => $userID];
+
+        if ($mybb->settings['ougc_threadcontributors_allowPostFiltering'] && $mybb->seo_support === false) {
+            $urlParams['action'] = 'thread';
+        }
+
+        $arguments['url'] = $PL->url_append($arguments['url'], $urlParams);
+
 
         return $arguments;
     }
