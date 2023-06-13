@@ -312,11 +312,23 @@ function ougc_threadcontributors_showthread(): void
 
     $done_users = [];
 
+    $currentUserID = false;
+
+    if ($mybb->settings['ougc_threadcontributors_allowPostFiltering']) {
+        $currentUserID = $mybb->get_input('otc_filter', \MyBB::INPUT_INT);
+    }
+
     while ($user = $db->fetch_array($query, 'pid')) {
         $uid = (int)$user['uid'];
 
         if (isset($done_users[$uid])) {
             continue;
+        }
+
+        $currentUserClass = '';
+
+        if ($currentUserID !== false && $currentUserID > 0) {
+            $currentUserClass = 'currentContributorFilter';
         }
 
         $done_users[$uid] = true;
