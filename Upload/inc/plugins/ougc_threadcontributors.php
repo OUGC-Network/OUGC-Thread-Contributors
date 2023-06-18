@@ -310,6 +310,12 @@ function ougc_threadcontributors_showthread(): void
 
     $max_dimensions = $max_dimension . 'x' . $max_dimension;
 
+    global $PL;
+
+    if (!($PL instanceof \PluginLibrary)) {
+        require_once \PLUGINLIBRARY;
+    }
+
     $done_users = [];
 
     while ($user = $db->fetch_array($query, 'pid')) {
@@ -326,10 +332,16 @@ function ougc_threadcontributors_showthread(): void
         //$date = my_date('relative', $user['dateline']);
 
         if ($mybb->settings['ougc_threadcontributors_allowPostFiltering']) {
-            $user['profilelink'] = get_thread_link($thread['tid'], 0, 'thread') . "&amp;otc_filter={$uid}";
+            if ($mybb->seo_support === true) {
+                $userLink = get_thread_link($thread['tid']);
+            } else {
+                $userLink = get_thread_link($thread['tid'], 0, 'thread');
+            }
         } else {
-            $user['profilelink'] = get_profile_link($uid);
+            $userLink = get_profile_link($uid);
         }
+
+        $user['profilelink'] = $PL->url_append($userLink, ['otc_filter' => $uid]);
 
         $user['username_formatted'] = format_name($user['username'], $user['usergroup'], $user['displaygroup']);
 
@@ -556,10 +568,22 @@ class OUGC_ThreadContributors
     function hook_multipage(array &$arguments): array
     {
         global $mybb;
+        global $PL;
+
+        if (!($PL instanceof \PluginLibrary)) {
+            require_once \PLUGINLIBRARY;
+        }
 
         $userID = $mybb->get_input('otc_filter', \MyBB::INPUT_INT);
 
-        $arguments['url'] .= "&amp;action=thread&amp;otc_filter={$userID}";
+        $urlParams = ['otc_filter' => $userID];
+
+        if ($mybb->settings['ougc_threadcontributors_allowPostFiltering'] && $mybb->seo_support === false) {
+            $urlParams['action'] = 'thread';
+        }
+
+        $arguments['url'] = $PL->url_append($arguments['url'], $urlParams);
+
 
         return $arguments;
     }
