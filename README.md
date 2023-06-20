@@ -103,7 +103,7 @@ Follow the next steps in order to update your copy of this plugin.
 
 To display the list of contributors it is required that you edit the `showthread` template for each of your themes.
 
-1. Open the `header` template for editing.
+1. Open the `showthread` template for editing.
 2. Find `{$usersbrowsing}`.
 3. Add `{$ougc_threadcontributors_list}` right after.
 4. Save the template.
